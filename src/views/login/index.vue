@@ -44,30 +44,6 @@
       </el-form>
     </el-card>
     <img :src="login_center_bg" class="login-center-layout">
-    <el-dialog
-      title="特别赞助"
-      :visible.sync="supportDialogVisible"
-      width="30%">
-      <span>mall项目已由CODING特别赞助，点击去支持，页面加载完后点击<span class="color-main font-medium">免费体验</span>按钮即可完成支持，谢谢！</span>
-      <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogCancel">残忍拒绝</el-button>
-    <el-button type="primary" @click="dialogConfirm">去支持</el-button>
-      </span>
-    </el-dialog>
-    <el-dialog
-      title="公众号二维码"
-      :visible.sync="dialogVisible"
-      :show-close="false"
-      :center="true"
-      width="30%">
-      <div style="text-align: center">
-        <span>mall全套学习教程连载中<span class="color-main font-medium">关注公众号</span>第一时间获取</span>
-        <img src="http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/banner/qrcode_for_macrozheng_258.jpg" width="150" height="150" style="margin-top: 10px">
-      </div>
-      <span slot="footer" class="dialog-footer">
-    <el-button type="primary" @click="dialogConfirm">确定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -96,7 +72,7 @@
       return {
         loginForm: {
           username: 'admin',
-          password: '123456',
+          password: 'admin',
         },
         loginRules: {
           username: [{required: true, trigger: 'blur', validator: validateUsername}],
@@ -131,6 +107,7 @@
               this.$router.push({path: '/'})
             }).catch(() => {
               this.loading = false
+              console.log('登录失败！');
             })
           } else {
             console.log('参数验证不合法！');
@@ -158,7 +135,7 @@
     right: 0;
     width: 360px;
     margin: 140px auto;
-    border-top: 10px solid #409EFF;
+    border-top: 10px solid #10A284;
   }
 
   .login-title {
@@ -166,7 +143,7 @@
   }
 
   .login-center-layout {
-    background: #409EFF;
+    background: #10A284;
     width: auto;
     height: auto;
     max-width: 100%;
