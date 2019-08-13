@@ -38,12 +38,13 @@ export const constantRouterMap = [
     redirect: '/pms/product',
     name: 'pms',
     meta: {title: '商品', icon: 'product'},
-    children: [{
-      path: 'product',
-      name: 'product',
-      component: () => import('@/views/pms/product/index'),
-      meta: {title: '商品列表', icon: 'product-list'}
-    },
+    children: [
+      {
+        path: 'product',
+        name: 'product',
+        component: () => import('@/views/pms/product/index'),
+        meta: {title: '商品列表', icon: 'product-list'}
+      },
       {
         path: 'addProduct',
         name: 'addProduct',
@@ -62,14 +63,14 @@ export const constantRouterMap = [
         name: 'productRecycle',
         component: () => import('@/views/pms/product/index'),
         meta: {title: '商品回收站', icon: 'product-recycle'},
-        hidden: true
+        hidden: false
       },
       {
         path: 'productComment',
         name: 'productComment',
         component: () => import('@/views/pms/product/index'),
         meta: {title: '商品评价', icon: 'product-comment'},
-        hidden: true
+        hidden: false
       },
       {
         path: 'productCate',

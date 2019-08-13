@@ -1,9 +1,10 @@
 import request from '@/utils/request'
-export function fetchList(parentId,params) {
+
+export function fetchList(params) {
   return request({
-    url:'/productCategory/list/'+parentId,
-    method:'get',
-    params:params
+    url:'/product/selectProductKindByPCPage',
+    method:'post',
+    data: params
   })
 }
 export function deleteProductCate(id) {

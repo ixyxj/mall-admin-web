@@ -16,19 +16,19 @@
                 :data="list"
                 v-loading="listLoading" border>
         <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+          <template slot-scope="scope">{{scope.row.kindCode}}</template>
         </el-table-column>
         <el-table-column label="分类名称" align="center">
-          <template slot-scope="scope">{{scope.row.name}}</template>
+          <template slot-scope="scope">{{scope.row.kindName}}</template>
         </el-table-column>
         <el-table-column label="级别" width="100" align="center">
           <template slot-scope="scope">{{scope.row.level | levelFilter}}</template>
         </el-table-column>
         <el-table-column label="商品数量" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.productCount }}</template>
+          <template slot-scope="scope">{{scope.row.num }}</template>
         </el-table-column>
         <el-table-column label="数量单位" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.productUnit }}</template>
+          <template slot-scope="scope">{{scope.row.unite }}</template>
         </el-table-column>
         <el-table-column label="导航栏" width="100" align="center">
           <template slot-scope="scope">
@@ -36,7 +36,7 @@
               @change="handleNavStatusChange(scope.$index, scope.row)"
               :active-value="1"
               :inactive-value="0"
-              v-model="scope.row.navStatus">
+              v-model="scope.row.isEnable">
             </el-switch>
           </template>
         </el-table-column>
@@ -46,7 +46,7 @@
               @change="handleShowStatusChange(scope.$index, scope.row)"
               :active-value="1"
               :inactive-value="0"
-              v-model="scope.row.showStatus">
+              v-model="scope.row.isEnable">
             </el-switch>
           </template>
         </el-table-column>
@@ -87,9 +87,9 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         layout="total, sizes,prev, pager, next,jumper"
-        :page-size="listQuery.pageSize"
+        :page-size="listQuery.size"
         :page-sizes="[5,10,15]"
-        :current-page.sync="listQuery.pageNum"
+        :current-page.sync="listQuery.page"
         :total="total">
       </el-pagination>
     </div>
@@ -97,7 +97,7 @@
 </template>
 
 <script>
-  import {fetchList,deleteProductCate,updateShowStatus,updateNavStatus} from '@/api/productCate'
+  import {fetchList, deleteProductCate, updateShowStatus, updateNavStatus} from '@/api/productCate'
 
   export default {
     name: "productCateList",
@@ -107,10 +107,10 @@
         total: null,
         listLoading: true,
         listQuery: {
-          pageNum: 1,
-          pageSize: 5
+          page: 1,
+          size: 20
         },
-        parentId: 0
+        parentId: 1
       }
     },
     created() {
@@ -124,7 +124,7 @@
       }
     },
     methods: {
-      resetParentId(){
+      resetParentId() {
         if (this.$route.query.parentId != null) {
           this.parentId = this.$route.query.parentId;
         } else {
@@ -134,30 +134,34 @@
       handleAddProductCate() {
         this.$router.push('/pms/addProductCate');
       },
+      // 获取分类列表数据
       getList() {
         this.listLoading = true;
-        fetchList(this.parentId, this.listQuery).then(response => {
+        fetchList(this.listQuery).then(response => {
           this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
+          this.list = response.value.records;
+          this.total = response.value.total;
+          console.log(response)
+        }).catch( reason => {
+          console.log(reason)
         });
       },
       handleSizeChange(val) {
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
+        this.listQuery.page = 1
+        this.listQuery.size = val
         this.getList();
       },
       handleCurrentChange(val) {
-        this.listQuery.pageNum = val;
+        this.listQuery.size = val;
         this.getList();
       },
       handleNavStatusChange(index, row) {
         let data = new URLSearchParams();
-        let ids=[];
+        let ids = [];
         ids.push(row.id)
-        data.append('ids',ids);
-        data.append('navStatus',row.navStatus);
-        updateNavStatus(data).then(response=>{
+        data.append('ids', ids);
+        data.append('navStatus', row.navStatus);
+        updateNavStatus(data).then(response => {
           this.$message({
             message: '修改成功',
             type: 'success',
@@ -167,11 +171,11 @@
       },
       handleShowStatusChange(index, row) {
         let data = new URLSearchParams();
-        let ids=[];
+        let ids = [];
         ids.push(row.id)
-        data.append('ids',ids);
-        data.append('showStatus',row.showStatus);
-        updateShowStatus(data).then(response=>{
+        data.append('ids', ids);
+        data.append('showStatus', row.showStatus);
+        updateShowStatus(data).then(response => {
           this.$message({
             message: '修改成功',
             type: 'success',
@@ -186,7 +190,7 @@
         console.log('handleAddProductCate');
       },
       handleUpdate(index, row) {
-        this.$router.push({path:'/pms/updateProductCate',query:{id:row.id}});
+        this.$router.push({path: '/pms/updateProductCate', query: {id: row.id}});
       },
       handleDelete(index, row) {
         this.$confirm('是否要删除该品牌', '提示', {
