@@ -14,7 +14,7 @@
             v-for="item in selectProductCateList"
             :key="item.id"
             :label="item.name"
-            :value="item.id">
+            :value="item.kindName">
           </el-option>
         </el-select>
       </el-form-item>
@@ -42,6 +42,7 @@
       <el-form-item v-for="(filterProductAttr, index) in filterProductAttrList"
                     :label="index | filterLabelFilter"
                     :key="filterProductAttr.key"
+                    :hidden="true"
       >
         <el-cascader
           clearable
@@ -50,7 +51,7 @@
         </el-cascader>
         <el-button style="margin-left: 20px" @click.prevent="removeFilterAttr(filterProductAttr)">删除</el-button>
       </el-form-item>
-      <el-form-item>
+      <el-form-item :hidden="true">
         <el-button size="small" type="primary" @click="handleAddFilterAttr()">新增</el-button>
       </el-form-item>
       <el-form-item label="关键词：">
@@ -130,15 +131,16 @@
         this.productCate = Object.assign({}, defaultProductCate);
       }
       this.getSelectProductCateList();
-      this.getProductAttrCateList();
+      // this.getProductAttrCateList();
     },
     methods: {
       getSelectProductCateList() {
-        fetchList(0, {pageSize: 100, pageNum: 1}).then(response => {
-          this.selectProductCateList = response.data.list;
+        fetchList({size: 100, page: 1}).then(response => {
+          this.selectProductCateList = response.value.records;
           this.selectProductCateList.unshift({id: 0, name: '无上级分类'});
         });
       },
+      ///获取商品属性分类列表
       getProductAttrCateList() {
         fetchListWithAttr().then(response => {
           let list = response.data;

@@ -16,7 +16,7 @@ export function deleteProductCate(id) {
 
 export function createProductCate(data) {
   return request({
-    url:'/productCategory/create',
+    url:'/product//addProductKind',
     method:'post',
     data:data
   })
