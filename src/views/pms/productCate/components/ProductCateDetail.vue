@@ -4,40 +4,40 @@
              :rules="rules"
              ref="productCateFrom"
              label-width="150px">
-      <el-form-item label="分类名称：" prop="name">
-        <el-input v-model="productCate.name"></el-input>
+      <el-form-item label="分类名称：" prop="kindName">
+        <el-input v-model="productCate.kindName"></el-input>
       </el-form-item>
       <el-form-item label="上级分类：">
-        <el-select v-model="productCate.parentId"
+        <el-select v-model="productCate.parentCode"
                    placeholder="请选择分类">
           <el-option
             v-for="item in selectProductCateList"
             :key="item.id"
-            :label="item.name"
-            :value="item.kindName">
+            :label="item.kindName"
+            :value="item.kindCode">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="数量单位：">
-        <el-input v-model="productCate.productUnit"></el-input>
+        <el-input v-model="productCate.unite"></el-input>
       </el-form-item>
       <el-form-item label="排序：">
         <el-input v-model="productCate.sort"></el-input>
       </el-form-item>
       <el-form-item label="是否显示：">
-        <el-radio-group v-model="productCate.showStatus">
+        <el-radio-group v-model="productCate.isEnable">
           <el-radio :label="1">是</el-radio>
           <el-radio :label="0">否</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="是否显示在导航栏：">
-        <el-radio-group v-model="productCate.navStatus">
+        <el-radio-group v-model="productCate.isEnable">
           <el-radio :label="1">是</el-radio>
           <el-radio :label="0">否</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="分类图标：">
-        <single-upload v-model="productCate.icon"></single-upload>
+        <single-upload v-model="productCate.kindImg"></single-upload>
       </el-form-item>
       <el-form-item v-for="(filterProductAttr, index) in filterProductAttrList"
                     :label="index | filterLabelFilter"
@@ -55,10 +55,10 @@
         <el-button size="small" type="primary" @click="handleAddFilterAttr()">新增</el-button>
       </el-form-item>
       <el-form-item label="关键词：">
-        <el-input v-model="productCate.keywords"></el-input>
+        <el-input v-model="productCate.keyword"></el-input>
       </el-form-item>
       <el-form-item label="分类描述：">
-        <el-input type="textarea" :autosize="true" v-model="productCate.description"></el-input>
+        <el-input type="textarea" :autosize="true" v-model="productCate.common"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit('productCateFrom')">提交</el-button>
@@ -75,17 +75,21 @@
   import SingleUpload from '@/components/Upload/singleUpload';
 
   const defaultProductCate = {
-    description: '',
-    icon: '',
-    keywords: '',
-    name: '',
+    id: 0,
+    common: '',
+    keyword: '',
+    kindImg: '',
+    kindName: '',
+    kindCode: '',
     navStatus: 0,
-    parentId: 0,
-    productUnit: '',
-    showStatus: 0,
+    parentCode: '',
+    unite: '',
+    isEnable: 0,
     sort: 0,
+    level: 0,
     productAttributeIdList: []
   };
+
   export default {
     name: "ProductCateDetail",
     components: {SingleUpload},
@@ -113,8 +117,9 @@
     },
     created() {
       if (this.isEdit) {
-        getProductCate(this.$route.query.id).then(response => {
-          this.productCate = response.data;
+        console.log('kindCode==>' + this.$route.query.kindCode)
+        getProductCate(this.$route.query.kindCode).then(response => {
+          this.productCate = response.value;
         });
         getProductAttrInfo(this.$route.query.id).then(response => {
           if (response.data != null && response.data.length > 0) {
@@ -172,15 +177,16 @@
       },
       onSubmit(formName) {
         this.$refs[formName].validate((valid) => {
+          console.log(valid)
           if (valid) {
             this.$confirm('是否提交数据', '提示', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               type: 'warning'
             }).then(() => {
+              this.productCate.productAttributeIdList = this.getProductAttributeIdList();
               if (this.isEdit) {
-                this.productCate.productAttributeIdList = this.getProductAttributeIdList();
-                updateProductCate(this.$route.query.id, this.productCate).then(response => {
+                updateProductCate(this.productCate).then(response => {
                   this.$message({
                     message: '修改成功',
                     type: 'success',
@@ -189,8 +195,8 @@
                   this.$router.back();
                 });
               } else {
-                this.productCate.productAttributeIdList = this.getProductAttributeIdList();
                 createProductCate(this.productCate).then(response => {
+                  console.log(response.resultStatus)
                   this.$refs[formName].resetFields();
                   this.resetForm(formName);
                   this.$message({

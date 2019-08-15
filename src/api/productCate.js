@@ -2,60 +2,61 @@ import request from '@/utils/request'
 
 export function fetchList(params) {
   return request({
-    url:'/product/selectProductKindByPCPage',
-    method:'post',
+    url: '/product/selectProductKindByPCPage',
+    method: 'post',
     data: params
   })
 }
-export function deleteProductCate(id) {
+
+export function deleteProductCate(kindCode) {
   return request({
-    url:'/productCategory/delete/'+id,
-    method:'post'
+    url: '/product/delProductKind/' + kindCode,
+    method: 'get'
   })
 }
 
 export function createProductCate(data) {
   return request({
-    url:'/product//addProductKind',
-    method:'post',
-    data:data
+    url: '/product/addProductKind',
+    method: 'post',
+    data: data
   })
 }
 
-export function updateProductCate(id,data) {
+export function updateProductCate(data) {
   return request({
-    url:'/productCategory/update/'+id,
-    method:'post',
-    data:data
+    url: '/product/updateProductKind/',
+    method: 'post',
+    data: data
   })
 }
 
-export function getProductCate(id) {
+export function getProductCate(kindCode) {
   return request({
-    url:'/productCategory/'+id,
-    method:'get',
+    url: '/product/selectProductKindByKindCode/' + kindCode,
+    method: 'get',
   })
 }
 
 export function updateShowStatus(data) {
   return request({
-    url:'/productCategory/update/showStatus',
-    method:'post',
-    data:data
+    url: '/productCategory/update/showStatus',
+    method: 'post',
+    data: data
   })
 }
 
 export function updateNavStatus(data) {
   return request({
-    url:'/productCategory/update/navStatus',
-    method:'post',
-    data:data
+    url: '/productCategory/update/navStatus',
+    method: 'post',
+    data: data
   })
 }
 
 export function fetchListWithChildren() {
   return request({
-    url:'/productCategory/list/withChildren',
-    method:'get'
+    url: '/productCategory/list/withChildren',
+    method: 'get'
   })
 }

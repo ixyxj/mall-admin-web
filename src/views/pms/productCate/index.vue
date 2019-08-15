@@ -16,7 +16,7 @@
                 :data="list"
                 v-loading="listLoading" border>
         <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.kindCode}}</template>
+          <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column label="分类名称" align="center">
           <template slot-scope="scope">{{scope.row.kindName}}</template>
@@ -88,7 +88,7 @@
         @current-change="handleCurrentChange"
         layout="total, sizes,prev, pager, next,jumper"
         :page-size="listQuery.size"
-        :page-sizes="[5,10,15]"
+        :page-sizes="[20,40,60]"
         :current-page.sync="listQuery.page"
         :total="total">
       </el-pagination>
@@ -110,7 +110,7 @@
           page: 1,
           size: 20
         },
-        parentId: 1
+        parentId: 0
       }
     },
     created() {
@@ -152,7 +152,7 @@
         this.getList();
       },
       handleCurrentChange(val) {
-        this.listQuery.size = val;
+        // this.listQuery.size = val;
         this.getList();
       },
       handleNavStatusChange(index, row) {
@@ -190,7 +190,7 @@
         console.log('handleAddProductCate');
       },
       handleUpdate(index, row) {
-        this.$router.push({path: '/pms/updateProductCate', query: {id: row.id}});
+        this.$router.push({path: '/pms/updateProductCate', query: {kindCode: row.kindCode}});
       },
       handleDelete(index, row) {
         this.$confirm('是否要删除该品牌', '提示', {
@@ -198,7 +198,8 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteProductCate(row.id).then(response => {
+          console.log('delete==>' + row.kindCode)
+          deleteProductCate(row.kindCode).then(response => {
             this.$message({
               message: '删除成功',
               type: 'success',
