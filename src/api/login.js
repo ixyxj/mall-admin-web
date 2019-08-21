@@ -11,15 +11,9 @@ export function login(username, password) {
   })
 }
 
-export function getInfo() {
+export function getInfo(data) {
   return {
-    data: {
-      username: 'admin',
-      icon: 'http://192.168.2.105/zly.gif',
-      roles: [
-        'super_admin'
-      ]
-    }
+    data: data
   }
 }
 

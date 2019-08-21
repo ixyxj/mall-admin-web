@@ -88,7 +88,7 @@
         @current-change="handleCurrentChange"
         layout="total, sizes,prev, pager, next,jumper"
         :page-size="listQuery.size"
-        :page-sizes="[20,40,60]"
+        :page-sizes="[10,20,30]"
         :current-page.sync="listQuery.page"
         :total="total">
       </el-pagination>
@@ -108,7 +108,7 @@
         listLoading: true,
         listQuery: {
           page: 1,
-          size: 20
+          size: 10
         },
         parentId: 0
       }

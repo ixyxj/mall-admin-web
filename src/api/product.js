@@ -1,9 +1,9 @@
 import request from '@/utils/request'
-export function fetchList(params) {
+export function fetchList(data) {
   return request({
-    url:'/product/list',
-    method:'get',
-    params:params
+    url:'/product/selectProductByPCPage',
+    method:'post',
+    data:data
   })
 }
 
@@ -31,19 +31,11 @@ export function updateNewStatus(params) {
   })
 }
 
-export function updateRecommendStatus(params) {
+export function updateProductStatus(data) {
   return request({
-    url:'/product/update/recommendStatus',
+    url:'/product/updateProductStatusByCode',
     method:'post',
-    params:params
-  })
-}
-
-export function updatePublishStatus(params) {
-  return request({
-    url:'/product/update/publishStatus',
-    method:'post',
-    params:params
+    data:data
   })
 }
 
