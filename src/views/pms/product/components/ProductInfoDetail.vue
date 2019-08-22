@@ -67,7 +67,7 @@
 </template>
 
 <script>
-  import {fetchListWithChildren} from '@/api/productCate'
+  import {fetchListAll} from '@/api/productCate'
   // import {fetchList as fetchBrandList} from '@/api/brand'
   // import {getProduct} from '@/api/product';
   import {checkSuccess, getList as getRespList, getArray as getRespArray} from "@/utils/response";
@@ -140,7 +140,7 @@
         this.hasEditCreated=true;
       },
       getProductCateList() {
-        fetchListWithChildren().then(response => {
+        fetchListAll().then(response => {
           if (checkSuccess(response)) {
             let list = getRespArray(response);
             this.productCateOptions = [];

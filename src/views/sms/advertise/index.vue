@@ -139,164 +139,169 @@
   </div>
 </template>
 <script>
-  import {fetchList,updateStatus,deleteHomeAdvertise} from '@/api/homeAdvertise';
-  import {formatDate} from '@/utils/date';
-  const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 5,
-    name: null,
-    type: null,
-    endTime:null
-  };
-  const defaultTypeOptions = [
-    {
-      label: 'PC首页轮播',
-      value: 0
-    },
-    {
-      label: 'APP首页轮播',
-      value: 1
-    }
-  ];
-  export default {
-    name: 'homeAdvertiseList',
-    data() {
-      return {
-        listQuery: Object.assign({}, defaultListQuery),
-        typeOptions: Object.assign({}, defaultTypeOptions),
-        list: null,
-        total: null,
-        listLoading: false,
-        multipleSelection: [],
-        operates: [
-          {
-            label: "删除",
+    import {fetchList, updateStatus, deleteHomeAdvertise} from '@/api/homeAdvertise';
+    import {formatDate} from '@/utils/date';
+    import {checkSuccess, getList, getTotal} from "../../../utils/response";
+
+    const defaultListQuery = {
+        page: 1,
+        size: 10,
+        advertName: null,
+        type: null,
+        dueTime: null
+    };
+    const defaultTypeOptions = [
+        {
+            label: 'PC首页轮播',
             value: 0
-          }
-        ],
-        operateType: null
-      }
-    },
-    created() {
-      this.getList();
-    },
-    filters:{
-      formatType(type){
-        if(type===1){
-          return 'APP首页轮播';
-        }else{
-          return 'PC首页轮播';
+        },
+        {
+            label: 'APP首页轮播',
+            value: 1
         }
-      },
-      formatTime(time){
-        if(time==null||time===''){
-          return 'N/A';
-        }
-        let date = new Date(time);
-        return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
-      },
-    },
-    methods: {
-      handleResetSearch() {
-        this.listQuery = Object.assign({}, defaultListQuery);
-      },
-      handleSearchList() {
-        this.listQuery.pageNum = 1;
-        this.getList();
-      },
-      handleSelectionChange(val){
-        this.multipleSelection = val;
-      },
-      handleSizeChange(val) {
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
-        this.getList();
-      },
-      handleCurrentChange(val) {
-        this.listQuery.pageNum = val;
-        this.getList();
-      },
-      handleUpdateStatus(index,row){
-        this.$confirm('是否要修改上线/下线状态?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          updateStatus(row.id,{status:row.status}).then(response=>{
+    ];
+    export default {
+        name: 'homeAdvertiseList',
+        data() {
+            return {
+                listQuery: Object.assign({}, defaultListQuery),
+                typeOptions: Object.assign({}, defaultTypeOptions),
+                list: null,
+                total: null,
+                listLoading: false,
+                multipleSelection: [],
+                operates: [
+                    {
+                        label: "删除",
+                        value: 0
+                    }
+                ],
+                operateType: null
+            }
+        },
+        created() {
             this.getList();
-            this.$message({
-              type: 'success',
-              message: '修改成功!'
-            });
-          });
-        }).catch(() => {
-          this.$message({
-            type: 'success',
-            message: '已取消操作!'
-          });
-          this.getList();
-        });
-      },
-      handleDelete(index,row){
-        this.deleteHomeAdvertise(row.id);
-      },
-      handleBatchOperate(){
-        if (this.multipleSelection < 1) {
-          this.$message({
-            message: '请选择一条记录',
-            type: 'warning',
-            duration: 1000
-          });
-          return;
+        },
+        filters: {
+            formatType(type) {
+                if (type === 1) {
+                    return 'APP首页轮播';
+                } else {
+                    return 'PC首页轮播';
+                }
+            },
+            formatTime(time) {
+                if (time == null || time === '') {
+                    return 'N/A';
+                }
+                let date = new Date(time);
+                return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
+            },
+        },
+        methods: {
+            handleResetSearch() {
+                this.listQuery = Object.assign({}, defaultListQuery);
+            },
+            handleSearchList() {
+                this.listQuery.pageNum = 1;
+                this.getList();
+            },
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            handleSizeChange(val) {
+                this.listQuery.pageNum = 1;
+                this.listQuery.pageSize = val;
+                this.getList();
+            },
+            handleCurrentChange(val) {
+                this.listQuery.pageNum = val;
+                this.getList();
+            },
+            handleUpdateStatus(index, row) {
+                this.$confirm('是否要修改上线/下线状态?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    updateStatus(row.id, {status: row.status}).then(response => {
+                        this.getList();
+                        this.$message({
+                            type: 'success',
+                            message: '修改成功!'
+                        });
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'success',
+                        message: '已取消操作!'
+                    });
+                    this.getList();
+                });
+            },
+            handleDelete(index, row) {
+                this.deleteHomeAdvertise(row.id);
+            },
+            handleBatchOperate() {
+                if (this.multipleSelection < 1) {
+                    this.$message({
+                        message: '请选择一条记录',
+                        type: 'warning',
+                        duration: 1000
+                    });
+                    return;
+                }
+                let ids = [];
+                for (let i = 0; i < this.multipleSelection.length; i++) {
+                    ids.push(this.multipleSelection[i].id);
+                }
+                if (this.operateType === 0) {
+                    //删除
+                    this.deleteHomeAdvertise(ids);
+                } else {
+                    this.$message({
+                        message: '请选择批量操作类型',
+                        type: 'warning',
+                        duration: 1000
+                    });
+                }
+            },
+            handleAdd() {
+                this.$router.push({path: '/sms/addAdvertise'})
+            },
+            handleUpdate(index, row) {
+                this.$router.push({path: '/sms/updateAdvertise', query: {id: row.id}})
+            },
+            getList() {
+                this.listLoading = true;
+                fetchList(this.listQuery).then(response => {
+                    this.listLoading = false;
+                    console.log(response)
+                    if (checkSuccess(response)) {
+                        this.list = getList(response);
+                        this.total = getTotal(response);
+                    }
+                })
+            },
+            deleteHomeAdvertise(ids) {
+                this.$confirm('是否要删除该广告?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    let params = new URLSearchParams();
+                    params.append("ids", ids);
+                    deleteHomeAdvertise(params).then(response => {
+                        this.getList();
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                    });
+                })
+            }
         }
-        let ids = [];
-        for (let i = 0; i < this.multipleSelection.length; i++) {
-          ids.push(this.multipleSelection[i].id);
-        }
-        if(this.operateType===0){
-          //删除
-          this.deleteHomeAdvertise(ids);
-        }else {
-          this.$message({
-            message: '请选择批量操作类型',
-            type: 'warning',
-            duration: 1000
-          });
-        }
-      },
-      handleAdd(){
-        this.$router.push({path: '/sms/addAdvertise'})
-      },
-      handleUpdate(index,row){
-        this.$router.push({path: '/sms/updateAdvertise', query: {id: row.id}})
-      },
-      getList() {
-        this.listLoading = true;
-        fetchList(this.listQuery).then(response => {
-          this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
-        })
-      },
-      deleteHomeAdvertise(ids){
-        this.$confirm('是否要删除该广告?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          let params=new URLSearchParams();
-          params.append("ids",ids);
-          deleteHomeAdvertise(params).then(response=>{
-            this.getList();
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            });
-          });
-        })
-      }
     }
-  }
 </script>
 <style scoped>
   .input-width {

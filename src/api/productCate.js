@@ -54,9 +54,16 @@ export function updateNavStatus(data) {
   })
 }
 
-export function fetchListWithChildren() {
+export function fetchListAll() {
   return request({
     url: '/product/selectProductKindAll',
     method: 'post'
+  })
+}
+
+export function fetchListWithChildren(parentCode) {
+  return request({
+    url: '/product/selectProductKindByParentCode/' + parentCode,
+    method: 'get'
   })
 }

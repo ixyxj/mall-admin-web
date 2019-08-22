@@ -296,7 +296,7 @@
     import {fetchList as fetchSkuStockList, update as updateSkuStockList} from '@/api/skuStock'
     import {fetchList as fetchProductAttrList} from '@/api/productAttr'
     //import {fetchList as fetchBrandList} from '@/api/brand'
-    import {fetchListWithChildren} from '@/api/productCate'
+    import {fetchListAll} from '@/api/productCate'
     import {
         checkSuccess,
         getList as getResplist,
@@ -434,7 +434,7 @@
             //     });
             // },
             getProductCateList() {
-                fetchListWithChildren().then(response => {
+                fetchListAll().then(response => {
                     let list = getArray(response);
                     this.productCateOptions = [];
                     for (let i = 0; i < list.length; i++) {

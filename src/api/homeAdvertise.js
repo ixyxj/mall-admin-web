@@ -1,9 +1,9 @@
 import request from '@/utils/request'
-export function fetchList(params) {
+export function fetchList(data) {
   return request({
-    url:'/home/advertise/list',
-    method:'get',
-    params:params
+    url:'/order/selectAdvertByPage',
+    method:'post',
+    data:data
   })
 }
 export function updateStatus(id,params) {
