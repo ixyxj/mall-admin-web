@@ -141,7 +141,7 @@
           this.listLoading = false;
           this.list = response.value.records;
           this.total = response.value.total;
-          console.log(response)
+          console.log(this.list);
         }).catch( reason => {
           console.log(reason)
         });
@@ -219,11 +219,7 @@
         }
       },
       disableNextLevel(value) {
-        if (value === 0) {
-          return false;
-        } else {
-          return true;
-        }
+        return value !== 0;
       }
     }
   }

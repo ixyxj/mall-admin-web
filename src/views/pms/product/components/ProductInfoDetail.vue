@@ -35,6 +35,7 @@
       </el-form-item>
       <el-form-item label="商品货号：">
         <el-input v-model="value.productSn"></el-input>
+        <label class="label-hint">如果您不输入商品货号，系统将自动生成一个唯一的货号。</label>
       </el-form-item>
       <el-form-item label="商品售价：">
         <el-input v-model="value.price"></el-input>
@@ -44,6 +45,9 @@
       </el-form-item>
       <el-form-item label="商品库存：">
         <el-input v-model="value.stock"></el-input>
+      </el-form-item>
+      <el-form-item label="库存预警值：">
+        <el-input v-model="value.stockWarning"></el-input>
       </el-form-item>
       <el-form-item label="计量单位：">
         <el-input v-model="value.unit"></el-input>
@@ -193,4 +197,8 @@
 </script>
 
 <style scoped>
+  .label-hint {
+    font-size: 5px;
+    color: grey;
+  }
 </style>

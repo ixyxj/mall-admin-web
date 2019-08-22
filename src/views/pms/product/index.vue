@@ -1,5 +1,9 @@
 <template> 
   <div class="app-container">
+<!--    统计标签-->
+    <el-card class="operate-container" shadow="never">
+      <el-tag type="success">全部商品({{this.total}})</el-tag>
+    </el-card>
     <el-card class="filter-container" shadow="never">
       <div>
         <i class="el-icon-search"></i>
@@ -21,7 +25,11 @@
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
           <el-form-item label="输入搜索：">
-            <el-input style="width: 203px" v-model="listQuery.keyword" placeholder="商品名称"></el-input>
+            <el-input
+              clearable=""
+              style="width: 203px"
+              v-model="listQuery.productName"
+              placeholder="商品名称"></el-input>
           </el-form-item>
           <el-form-item label="商品货号：">
             <el-input style="width: 203px" v-model="listQuery.productSn" placeholder="商品货号"></el-input>
@@ -44,7 +52,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="上架状态：">
-            <el-select v-model="listQuery.publishStatus" placeholder="全部" clearable>
+            <el-select v-model="listQuery.isUpshelf" placeholder="全部" clearable>
               <el-option
                 v-for="item in publishStatusOptions"
                 :key="item.value"
@@ -54,7 +62,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="审核状态：">
-            <el-select v-model="listQuery.verifyStatus" placeholder="全部" clearable>
+            <el-select v-model="listQuery.status" placeholder="全部" clearable>
               <el-option
                 v-for="item in verifyStatusOptions"
                 :key="item.value"
@@ -98,8 +106,8 @@
         </el-table-column>
         <el-table-column label="价格/货号" width="120" align="center">
           <template slot-scope="scope">
-            <p>价格：￥{{scope.row.product.sellPrice}}</p>
-            <p>货号：{{scope.row.product.productCode}}</p>
+            <p>价格：￥{{scope.row.product.sellPrice/1000.0}}</p>
+<!--            <p>货号：{{scope.row.product.productCode}}</p>-->
           </template>
         </el-table-column>
         <el-table-column label="标签" width="140" align="center">
@@ -109,7 +117,7 @@
                 @change="handleProductStatusChange(scope.$index, scope.row)"
                 :active-value="1"
                 :inactive-value="0"
-                v-model="scope.row.product.isUpSelf">
+                v-model="scope.row.product.isUpshelf">
               </el-switch>
             </p>
             <!--            <p>新品：-->
@@ -206,9 +214,9 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         layout="total, sizes,prev, pager, next,jumper"
-        :page-size="listQuery.pageSize"
+        :page-size="listQuery.size"
         :page-sizes="[5,10,15]"
-        :current-page.sync="listQuery.pageNum"
+        :current-page.sync="listQuery.page"
         :total="total">
       </el-pagination>
     </div>
@@ -217,7 +225,7 @@
       :visible.sync="editSkuInfo.dialogVisible"
       width="40%">
       <span>商品货号：</span>
-      <span>{{editSkuInfo.productSn}}</span>
+      <span>{{editSkuInfo.productId}}</span>
       <el-input placeholder="按sku编号搜索" v-model="editSkuInfo.keyword" size="small" style="width: 50%;margin-left: 20px">
         <el-button slot="append" icon="el-icon-search" @click="handleSearchEditSku"></el-button>
       </el-input>
@@ -228,32 +236,38 @@
           label="SKU编号"
           align="center">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.skuCode"></el-input>
+            <el-input v-model="scope.row.id"></el-input>
           </template>
         </el-table-column>
         <el-table-column
-          v-for="(item,index) in editSkuInfo.productAttr"
-          :label="item.name"
-          :key="item.id"
+          label="重量"
           align="center">
           <template slot-scope="scope">
-            {{getProductSkuSp(scope.row,index)}}
+            <el-input v-model="scope.row.weight"></el-input>
           </template>
         </el-table-column>
         <el-table-column
-          label="销售价格"
-          width="80"
+          label="单位"
           align="center">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.price"></el-input>
+            <el-input v-model="scope.row.unite"></el-input>
           </template>
         </el-table-column>
+<!--        <el-table-column-->
+<!--          v-for="(item,index) in editSkuInfo.productAttr"-->
+<!--          :label="item.name"-->
+<!--          :key="item.id"-->
+<!--          align="center">-->
+<!--          <template slot-scope="scope">-->
+<!--            {{getProductSkuSp(scope.row,index)}}-->
+<!--          </template>-->
+<!--        </el-table-column>-->
         <el-table-column
           label="商品库存"
           width="80"
           align="center">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.stock"></el-input>
+            <el-input v-model="scope.row.stockTotal"></el-input>
           </template>
         </el-table-column>
         <el-table-column
@@ -261,7 +275,7 @@
           width="100"
           align="center">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.lowStock"></el-input>
+            <el-input v-model="scope.row.warnTotal"></el-input>
           </template>
         </el-table-column>
       </el-table>
@@ -288,6 +302,7 @@
         getList as getResplist,
         getTotal as getRespListTotal,
     } from '@/utils/response'
+    import {getArray} from "../../../utils/response";
 
     const defaultListQuery = {
         page: 1,
@@ -297,24 +312,13 @@
         name: "productList",
         data() {
             return {
-              //{
-            //   "id": 0,
-            //   "kindCode": "string",
-            //   "productKind": "string",
-            //   "productSpec": "string",
-            //   "skuCode": "string",
-            //   "stockTotal": 0,
-            //   "unite": "string",
-            //   "warnTotal": 0
-            // }
-                editSkuInfo: {
-                    dialogVisible: false,
-                    productId: null,
-                    productSn: '',
-                    productAttributeCategoryId: null,
-                    stockList: [],
-                    productAttr: [],
-                    keyword: null
+                editSkuInfo:{
+                    dialogVisible:false,
+                    productId:0,
+                    // productAttributeCategoryId:null,
+                    stockList:[],
+                    // productAttr:[],
+                    keyword:null
                 },
                 operates: [
                     {
@@ -382,12 +386,11 @@
         },
         watch: {
             selectProductCateValue: function (newValue) {
-                if (newValue != null && newValue.length === 2) {
-                    this.listQuery.productCategoryId = newValue[1];
+                if (newValue != null && newValue.length === 1) {
+                    this.listQuery.kindName = newValue[0];
                 } else {
-                    this.listQuery.productCategoryId = null;
+                    this.listQuery.kindName = null;
                 }
-
             }
         },
         filters: {
@@ -432,32 +435,19 @@
             // },
             getProductCateList() {
                 fetchListWithChildren().then(response => {
-                    let list = response.data;
+                    let list = getArray(response);
                     this.productCateOptions = [];
                     for (let i = 0; i < list.length; i++) {
-                        let children = [];
-                        if (list[i].children != null && list[i].children.length > 0) {
-                            for (let j = 0; j < list[i].children.length; j++) {
-                                children.push({label: list[i].children[j].name, value: list[i].children[j].id});
-                            }
-                        }
-                        this.productCateOptions.push({label: list[i].name, value: list[i].id, children: children});
+                        this.productCateOptions.push({label: list[i].kindName, value: list[i].kindName});
                     }
+                    console.log(this.productCateOptions);
                 });
             },
             handleShowSkuEditDialog(index, row) {
-                let product = row.product;
                 this.editSkuInfo.dialogVisible = true;
                 this.editSkuInfo.productId = row.product.id;
-                this.editSkuInfo.productSn = row.productSn;
-                this.editSkuInfo.productAttributeCategoryId = row.productAttributeCategoryId;
-                this.editSkuInfo.keyword = null;
-                fetchSkuStockList(row.id, {keyword: this.editSkuInfo.keyword}).then(response => {
-                    this.editSkuInfo.stockList = response.data;
-                });
-                fetchProductAttrList(row.productAttributeCategoryId, {type: 0}).then(response => {
-                    this.editSkuInfo.productAttr = response.data.list;
-                });
+                this.editSkuInfo.stockList.pop();
+                this.editSkuInfo.stockList.push(row.productStore);
             },
             handleSearchEditSku() {
                 fetchSkuStockList(this.editSkuInfo.productId, {keyword: this.editSkuInfo.keyword}).then(response => {
@@ -478,7 +468,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    updateSkuStockList(this.editSkuInfo.productId, this.editSkuInfo.stockList).then(response => {
+                    updateSkuStockList(this.editSkuInfo.stockList).then(response => {
                         this.$message({
                             message: '修改成功',
                             type: 'success',
@@ -488,8 +478,9 @@
                     });
                 });
             },
+            // 搜索
             handleSearchList() {
-                this.listQuery.pageNum = 1;
+                if ('' === this.listQuery.productName) this.listQuery.productName = null;
                 this.getList();
             },
             handleAddProduct() {
@@ -583,7 +574,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.updateDeleteStatus(row.product.id);
+                    this.updateDeleteStatus(row.product.productCode);
                 });
             },
             handleUpdateProduct(index, row) {
@@ -627,7 +618,7 @@
             // 更新商品状态
             updateProductStatus(product) {
                 let data = {
-                    isUpSelf: product.isUpSelf,
+                    isUpshelf: product.isUpshelf,
                     productCode: product.productCode,
                     recommend: product.recommend
                 };
@@ -648,9 +639,8 @@
             updateRecommendStatus(status, product_codes) {
             },
 
-            // 删除 TODO 也有问题
+            // 删除商品
             updateDeleteStatus(productCode) {
-                console.log('====>'+productCode)
                 updateDeleteStatus(productCode)
                   .then(response => {
                     if (checkSuccess(response)) {
