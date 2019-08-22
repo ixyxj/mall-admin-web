@@ -281,9 +281,13 @@
     } from '@/api/product'
     import {fetchList as fetchSkuStockList, update as updateSkuStockList} from '@/api/skuStock'
     import {fetchList as fetchProductAttrList} from '@/api/productAttr'
-    import {fetchList as fetchBrandList} from '@/api/brand'
+    //import {fetchList as fetchBrandList} from '@/api/brand'
     import {fetchListWithChildren} from '@/api/productCate'
-    import {check_success, get_list as get_resp_list, get_total as get_resp_list_total} from '@/utils/response'
+    import {
+        checkSuccess,
+        getList as getResplist,
+        getTotal as getRespListTotal,
+    } from '@/utils/response'
 
     const defaultListQuery = {
         page: 1,
@@ -293,6 +297,16 @@
         name: "productList",
         data() {
             return {
+              //{
+            //   "id": 0,
+            //   "kindCode": "string",
+            //   "productKind": "string",
+            //   "productSpec": "string",
+            //   "skuCode": "string",
+            //   "stockTotal": 0,
+            //   "unite": "string",
+            //   "warnTotal": 0
+            // }
                 editSkuInfo: {
                     dialogVisible: false,
                     productId: null,
@@ -363,7 +377,7 @@
         },
         created() {
             this.getList();
-            this.getBrandList();
+            // this.getBrandList();
             this.getProductCateList();
         },
         watch: {
@@ -401,21 +415,21 @@
                 fetchList(this.listQuery).then(response => {
                     console.log(response);
                     this.listLoading = false;
-                    if (check_success(response)) {
-                        this.list = get_resp_list(response);
-                        this.total = get_resp_list_total(response);
+                    if (checkSuccess(response)) {
+                        this.list = getResplist(response);
+                        this.total = getRespListTotal(response);
                     }
                 });
             },
-            getBrandList() {
-                fetchBrandList({pageNum: 1, pageSize: 100}).then(response => {
-                    this.brandOptions = [];
-                    let brandList = response.data.list;
-                    for (let i = 0; i < brandList.length; i++) {
-                        this.brandOptions.push({label: brandList[i].name, value: brandList[i].id});
-                    }
-                });
-            },
+            // getBrandList() {
+            //     fetchBrandList({pageNum: 1, pageSize: 100}).then(response => {
+            //         this.brandOptions = [];
+            //         let brandList = response.data.list;
+            //         for (let i = 0; i < brandList.length; i++) {
+            //             this.brandOptions.push({label: brandList[i].name, value: brandList[i].id});
+            //         }
+            //     });
+            // },
             getProductCateList() {
                 fetchListWithChildren().then(response => {
                     let list = response.data;
@@ -432,8 +446,9 @@
                 });
             },
             handleShowSkuEditDialog(index, row) {
+                let product = row.product;
                 this.editSkuInfo.dialogVisible = true;
-                this.editSkuInfo.productId = row.id;
+                this.editSkuInfo.productId = row.product.id;
                 this.editSkuInfo.productSn = row.productSn;
                 this.editSkuInfo.productAttributeCategoryId = row.productAttributeCategoryId;
                 this.editSkuInfo.keyword = null;
@@ -561,28 +576,39 @@
                 this.selectProductCateValue = [];
                 this.listQuery = Object.assign({}, defaultListQuery);
             },
+            //删除商品
             handleDelete(index, row) {
                 this.$confirm('是否要进行删除操作?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    let ids = [];
-                    ids.push(row.id);
-                    this.updateDeleteStatus(1, ids);
+                    this.updateDeleteStatus(row.product.id);
                 });
             },
             handleUpdateProduct(index, row) {
                 this.$router.push({path: '/pms/updateProduct', query: {id: row.id}});
             },
+            //查看功能
             handleShowProduct(index, row) {
                 console.log("handleShowProduct", row);
+                this.$notify({
+                    message: this.$t('message.messageNotFinish'),
+                    type: 'success',
+                    duration: 1000
+                });
             },
             handleShowVerifyDetail(index, row) {
                 console.log("handleShowVerifyDetail", row);
             },
+            //查看日志
             handleShowLog(index, row) {
                 console.log("handleShowLog", row);
+                this.$notify({
+                  message: this.$t('message.messageNotFinish'),
+                  type: 'success',
+                  duration: 1000
+                });
             },
 
             updateNewStatus(newStatus, ids) {
@@ -622,18 +648,25 @@
             updateRecommendStatus(status, product_codes) {
             },
 
-            updateDeleteStatus(deleteStatus, ids) {
-                let params = new URLSearchParams();
-                params.append('ids', ids);
-                params.append('deleteStatus', deleteStatus);
-                updateDeleteStatus(params).then(response => {
-                    this.$message({
-                        message: '删除成功',
-                        type: 'success',
-                        duration: 1000
-                    });
-                });
-                this.getList();
+            // 删除 TODO 也有问题
+            updateDeleteStatus(productCode) {
+                console.log('====>'+productCode)
+                updateDeleteStatus(productCode)
+                  .then(response => {
+                    if (checkSuccess(response)) {
+                        this.$notify({
+                          message: this.$t('message.deleteSuccess'),
+                          type: 'success',
+                          duration: 1000
+                        });
+                        this.getList();
+                    } else {
+                        this.$notify.error(this.$t('message.deleteFailure'))
+                    }
+                  })
+                  .catch(function (e) {
+                      this.$notify.error(this.$t('message.deleteFailure'))
+                  });
             }
         }
     }

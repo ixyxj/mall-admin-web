@@ -13,19 +13,19 @@
       <el-form-item label="副标题：" prop="subTitle">
         <el-input v-model="value.subTitle"></el-input>
       </el-form-item>
-      <el-form-item label="商品品牌：" prop="brandId">
-        <el-select
-          v-model="value.brandId"
-          @change="handleBrandChange"
-          placeholder="请选择品牌">
-          <el-option
-            v-for="item in brandOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
+<!--      <el-form-item label="商品品牌：" prop="brandId" hidden="hidden">-->
+<!--        <el-select-->
+<!--          v-model="value.brandId"-->
+<!--          @change="handleBrandChange"-->
+<!--          placeholder="请选择品牌">-->
+<!--          <el-option-->
+<!--            v-for="item in brandOptions"-->
+<!--            :key="item.value"-->
+<!--            :label="item.label"-->
+<!--            :value="item.value">-->
+<!--          </el-option>-->
+<!--        </el-select>-->
+<!--      </el-form-item>-->
       <el-form-item label="商品介绍：">
         <el-input
           :autoSize="true"
@@ -64,8 +64,9 @@
 
 <script>
   import {fetchListWithChildren} from '@/api/productCate'
-  import {fetchList as fetchBrandList} from '@/api/brand'
-  import {getProduct} from '@/api/product';
+  // import {fetchList as fetchBrandList} from '@/api/brand'
+  // import {getProduct} from '@/api/product';
+  import {checkSuccess, getList as getRespList, getArray as getRespArray} from "@/utils/response";
 
   export default {
     name: "ProductInfoDetail",
@@ -98,7 +99,7 @@
     },
     created() {
       this.getProductCateList();
-      this.getBrandList();
+      // this.getBrandList();
     },
     computed:{
       //商品的编号
@@ -114,56 +115,51 @@
         this.handleEditCreated();
       },
       selectProductCateValue: function (newValue) {
-        if (newValue != null && newValue.length === 2) {
-          this.value.productCategoryId = newValue[1];
+        console.log(newValue)
+        if (newValue != null && newValue.length === 1) {
+          this.value.productCategoryId = newValue[0];
           this.value.productCategoryName= this.getCateNameById(this.value.productCategoryId);
         } else {
           this.value.productCategoryId = null;
           this.value.productCategoryName=null;
         }
+        console.log(this.value.productCategoryId + ":" + this.value.productCategoryName)
       }
     },
     methods: {
       //处理编辑逻辑
       handleEditCreated(){
         if(this.value.productCategoryId!=null){
-          this.selectProductCateValue.push(this.value.cateParentId);
           this.selectProductCateValue.push(this.value.productCategoryId);
+          this.selectProductCateValue.push(this.value.productCategoryName);
         }
         this.hasEditCreated=true;
       },
       getProductCateList() {
         fetchListWithChildren().then(response => {
-          let list = response.data;
-          this.productCateOptions = [];
-          for (let i = 0; i < list.length; i++) {
-            let children = [];
-            if (list[i].children != null && list[i].children.length > 0) {
-              for (let j = 0; j < list[i].children.length; j++) {
-                children.push({label: list[i].children[j].name, value: list[i].children[j].id});
-              }
+          if (checkSuccess(response)) {
+            let list = getRespArray(response);
+            this.productCateOptions = [];
+            for (let i = 0; i < list.length; i++) {
+              this.productCateOptions.push({label: list[i].kindName, value: list[i].kindCode});
             }
-            this.productCateOptions.push({label: list[i].name, value: list[i].id, children: children});
           }
         });
       },
-      getBrandList() {
-        fetchBrandList({pageNum: 1, pageSize: 100}).then(response => {
-          this.brandOptions = [];
-          let brandList = response.data.list;
-          for (let i = 0; i < brandList.length; i++) {
-            this.brandOptions.push({label: brandList[i].name, value: brandList[i].id});
-          }
-        });
-      },
+      // getBrandList() {
+      //   fetchBrandList({pageNum: 1, pageSize: 100}).then(response => {
+      //     this.brandOptions = [];
+      //     let brandList = response.data.list;
+      //     for (let i = 0; i < brandList.length; i++) {
+      //       this.brandOptions.push({label: brandList[i].name, value: brandList[i].id});
+      //     }
+      //   });
+      // },
       getCateNameById(id){
         let name=null;
         for(let i=0;i<this.productCateOptions.length;i++){
-          for(let j=0;i<this.productCateOptions[i].children.length;j++){
-            if(this.productCateOptions[i].children[j].value===id){
-              name=this.productCateOptions[i].children[j].label;
-              return name;
-            }
+          if (this.productCateOptions[i].kindCode === id) {
+            return this.productCateOptions[i].kindName;
           }
         }
         return name;

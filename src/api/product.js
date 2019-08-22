@@ -15,11 +15,10 @@ export function fetchSimpleList(params) {
   })
 }
 
-export function updateDeleteStatus(params) {
+export function updateDeleteStatus(id) {
   return request({
-    url:'/product/update/deleteStatus',
-    method:'post',
-    params:params
+    url:'/product/delProduct/' + id,
+    method:'get'
   })
 }
 
