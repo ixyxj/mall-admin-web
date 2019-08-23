@@ -2,11 +2,11 @@
   <div>
     <el-upload
       action="https://upload-z2.qiniup.com"
-      :data="dataObj"
       list-type="picture"
       :multiple="false"
       :show-file-list="showFileList"
       :file-list="fileList"
+      :http-request="uploadQiniu"
       :before-upload="beforeUpload"
       :on-remove="handleRemove"
       :on-success="handleUploadSuccess"
@@ -20,8 +20,8 @@
   </div>
 </template>
 <script>
-    // import {policy} from '@/api/oss'
     import * as qiniu from 'qiniu-js'
+    import {getToken, upload} from "@/api/oss";
 
     export default {
         name: 'qiniuSingleUpload',
@@ -47,7 +47,7 @@
             },
             showFileList: {
                 get: function () {
-                    return this.value !== null && this.value !== ''&& this.value!==undefined;
+                    return this.value !== null && this.value !== '' && this.value !== undefined;
                 },
                 set: function (newValue) {
                 }
@@ -55,16 +55,8 @@
         },
         data() {
             return {
-                dataObj: {
-                    policy: '',
-                    signature: '',
-                    key: '',
-                    ossaccessKeyId: '',
-                    dir: '',
-                    host: '',
-                    // callback:'',
-                },
-                dialogVisible: false
+                dialogVisible: false,
+                host: 'http://image.1688bee.com'
             };
         },
         methods: {
@@ -78,29 +70,45 @@
                 this.dialogVisible = true;
             },
             beforeUpload(file) {
-                let _self = this;
-                return new Promise((resolve, reject) => {
-                    policy().then(response => {
-                        _self.dataObj.policy = response.data.policy;
-                        _self.dataObj.signature = response.data.signature;
-                        _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
-                        _self.dataObj.key = response.data.dir + '/${filename}';
-                        _self.dataObj.dir = response.data.dir;
-                        _self.dataObj.host = response.data.host;
-                        // _self.dataObj.callback = response.data.callback;
-                        resolve(true)
-                    }).catch(err => {
-                        console.log(err)
-                        reject(false)
-                    })
-                })
+                const isLimit = file.size <= 200000; //200k
+                if (!isLimit) this.$message.error('上传图片大小不能超过200k!!!');
+                return isLimit;
             },
             handleUploadSuccess(res, file) {
+                console.log('==========handleUploadSuccess');
                 this.showFileList = true;
                 this.fileList.pop();
-                this.fileList.push({name: file.name, url: this.dataObj.host + '/' + this.dataObj.dir + '/' + file.name});
+                this.fileList.push({name: file.name, url: this.host + '/' + file.name});
                 this.emitInput(this.fileList[0].url);
-            }
+            },
+
+
+            uploadQiniu(request) {
+                getToken().then(response => {
+                    let uploadToken = response.value;
+                    console.log('token ==> ' + uploadToken);
+                    upload(uploadToken, request,
+                        next => {
+                            console.log('==========next');
+                            let total = next.total;
+                            console.log(total);
+                        },
+                        error => {
+                            console.log('==========error');
+                            console.log(error);
+                        },
+                        completed => {
+                            console.log('==========completed');
+                            console.log(completed);
+                            let hash = completed.hash;
+                            let key = completed.key;
+                            this.fileList.pop();
+                            this.fileList.push({name: '====', url: this.host + '/' + key});
+                            console.log(this.fileList);
+                            this.emitInput(this.fileList[0].url);
+                        });
+                })
+            },
         }
     }
 </script>

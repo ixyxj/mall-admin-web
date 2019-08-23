@@ -81,7 +81,7 @@
   </el-card>
 </template>
 <script>
-    import SingleUpload from '@/components/Upload/singleUpload'
+    import SingleUpload from '@/components/Upload/qiniuSingleUpload'
     import {createHomeAdvertise, getHomeAdvertise, updateHomeAdvertise} from '@/api/homeAdvertise'
     import {fetchListWithChildren} from "@/api/productCate";
     import {getArray, checkSuccess} from "@/utils/response";
