@@ -202,7 +202,7 @@ export const constantRouterMap = [
   {
     path: '/sms',
     component: Layout,
-    redirect: '/sms/coupon',
+    redirect: '/sms/advertise',
     name: 'sms',
     meta: {title: '运营', icon: 'sms'},
     children: [

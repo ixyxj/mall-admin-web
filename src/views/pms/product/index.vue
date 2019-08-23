@@ -547,12 +547,12 @@
                 });
             },
             handleSizeChange(val) {
-                this.listQuery.pageNum = 1;
-                this.listQuery.pageSize = val;
+                this.listQuery.page = 1;
+                this.listQuery.size = val;
                 this.getList();
             },
             handleCurrentChange(val) {
-                this.listQuery.pageNum = val;
+                this.listQuery.page = val;
                 this.getList();
             },
             handleSelectionChange(val) {

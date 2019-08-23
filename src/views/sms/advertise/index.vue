@@ -21,7 +21,7 @@
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
           <el-form-item label="广告名称：">
-            <el-input v-model="listQuery.name" class="input-width" placeholder="广告名称"></el-input>
+            <el-input v-model="listQuery.advertName" class="input-width" placeholder="广告名称"></el-input>
           </el-form-item>
           <el-form-item label="广告位置：">
             <el-select v-model="listQuery.type" placeholder="全部" clearable class="input-width">
@@ -35,9 +35,8 @@
           <el-form-item label="到期时间：">
             <el-date-picker
               class="input-width"
-              v-model="listQuery.endTime"
-              value-format="yyyy-MM-dd"
-              type="date"
+              v-model="listQuery.dueTime"
+              type="datetime"
               placeholder="请选择时间">
             </el-date-picker>
           </el-form-item>
@@ -56,38 +55,38 @@
                 @selection-change="handleSelectionChange"
                 v-loading="listLoading" border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="120" align="center">
+        <el-table-column label="编号" width="60" align="center">
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column label="广告名称" align="center">
-          <template slot-scope="scope">{{scope.row.name}}</template>
+          <template slot-scope="scope">{{scope.row.advertName}}</template>
         </el-table-column>
         <el-table-column label="广告位置" width="120" align="center">
           <template slot-scope="scope">{{scope.row.type | formatType}}</template>
         </el-table-column>
-        <el-table-column label="广告图片" width="120" align="center">
-          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.pic"></template>
+        <el-table-column label="广告图片" align="center">
+          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.advertImage"></template>
         </el-table-column>
-        <el-table-column label="时间" width="220" align="center">
+        <el-table-column label="时间" width="240" align="center">
           <template slot-scope="scope">
             <p>开始时间：{{scope.row.startTime | formatTime}}</p>
-            <p>到期时间：{{scope.row.endTime | formatTime}}</p>
+            <p>到期时间：{{scope.row.dueTime | formatTime}}</p>
           </template>
         </el-table-column>
-        <el-table-column label="上线/下线" width="120" align="center">
+        <el-table-column label="下线/上线" width="120" align="center">
           <template slot-scope="scope">
             <el-switch
               @change="handleUpdateStatus(scope.$index, scope.row)"
               :active-value="1"
               :inactive-value="0"
-              v-model="scope.row.status">
+              v-model="scope.row.isOnline">
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="点击次数" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.clickCount}}</template>
+        <el-table-column label="点击次数" width="60" align="center">
+          <template slot-scope="scope">{{scope.row.clickNum}}</template>
         </el-table-column>
-        <el-table-column label="生成订单" width="120" align="center">
+        <el-table-column label="生成订单" width="60" align="center">
           <template slot-scope="scope">{{scope.row.orderCount}}</template>
         </el-table-column>
         <el-table-column label="操作" width="120" align="center">
@@ -130,9 +129,9 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         layout="total, sizes,prev, pager, next,jumper"
-        :page-size="listQuery.pageSize"
+        :page-size="listQuery.size"
         :page-sizes="[5,10,15]"
-        :current-page.sync="listQuery.pageNum"
+        :current-page.sync="listQuery.page"
         :total="total">
       </el-pagination>
     </div>
@@ -141,23 +140,28 @@
 <script>
     import {fetchList, updateStatus, deleteHomeAdvertise} from '@/api/homeAdvertise';
     import {formatDate} from '@/utils/date';
-    import {checkSuccess, getList, getTotal} from "../../../utils/response";
+    import {checkSuccess, getList, getTotal} from "@/utils/response";
 
     const defaultListQuery = {
         page: 1,
         size: 10,
-        advertName: null,
-        type: null,
-        dueTime: null
     };
     const defaultTypeOptions = [
         {
-            label: 'PC首页轮播',
-            value: 0
+            label: '小程序首页轮播',
+            value: 1
         },
         {
-            label: 'APP首页轮播',
-            value: 1
+            label: '小程序banner',
+            value: 2
+        },
+        {
+            label: 'PC端首页轮播',
+            value: 3
+        },
+        {
+            label: 'PC端分类广告',
+            value: 4
         }
     ];
     export default {
@@ -184,11 +188,8 @@
         },
         filters: {
             formatType(type) {
-                if (type === 1) {
-                    return 'APP首页轮播';
-                } else {
-                    return 'PC首页轮播';
-                }
+                const index = type - 1;
+                return defaultTypeOptions[index].label;
             },
             formatTime(time) {
                 if (time == null || time === '') {
@@ -203,19 +204,23 @@
                 this.listQuery = Object.assign({}, defaultListQuery);
             },
             handleSearchList() {
-                this.listQuery.pageNum = 1;
+                this.listQuery.page = 1;
+                if ('' === this.listQuery.advertName) delete this.listQuery.advertName;
+                if ('' === this.listQuery.type) delete this.listQuery.type;
+                if (null === this.listQuery.dueTime) delete this.listQuery.dueTime;
+                this.listQuery.dueTime = this.listQuery.dueTime.getTime().toString();
                 this.getList();
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
             handleSizeChange(val) {
-                this.listQuery.pageNum = 1;
-                this.listQuery.pageSize = val;
+                this.listQuery.page = 1;
+                this.listQuery.size = val;
                 this.getList();
             },
             handleCurrentChange(val) {
-                this.listQuery.pageNum = val;
+                this.listQuery.page = val;
                 this.getList();
             },
             handleUpdateStatus(index, row) {
@@ -224,14 +229,14 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    updateStatus(row.id, {status: row.status}).then(response => {
+                    updateStatus(row.isOnline, [row.advertCode]).then(response => {
                         this.getList();
                         this.$message({
                             type: 'success',
                             message: '修改成功!'
                         });
                     });
-                }).catch(() => {
+                }).catch(reason => {
                     this.$message({
                         type: 'success',
                         message: '已取消操作!'
@@ -240,7 +245,7 @@
                 });
             },
             handleDelete(index, row) {
-                this.deleteHomeAdvertise(row.id);
+                this.deleteHomeAdvertise(row.advertCode);
             },
             handleBatchOperate() {
                 if (this.multipleSelection < 1) {
@@ -270,7 +275,7 @@
                 this.$router.push({path: '/sms/addAdvertise'})
             },
             handleUpdate(index, row) {
-                this.$router.push({path: '/sms/updateAdvertise', query: {id: row.id}})
+                this.$router.push({path: '/sms/updateAdvertise', query: {data: row}})
             },
             getList() {
                 this.listLoading = true;
@@ -289,9 +294,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    let params = new URLSearchParams();
-                    params.append("ids", ids);
-                    deleteHomeAdvertise(params).then(response => {
+                    deleteHomeAdvertise(ids).then(response => {
                         this.getList();
                         this.$message({
                             type: 'success',

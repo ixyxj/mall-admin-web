@@ -20,8 +20,7 @@ export function upload(token, request, next, error, completed) {
   const {
     file
   } = request;
-  const key = formatDate(new Date(), 'yyyyMMddhhmmsss') + parseInt(Math.random() * 1000, 10);
-  console.log(parseInt(Math.random() * 1000, 10));
+  const key = formatDate(new Date(), 'yyyyMMddhhmmssSSS') + parseInt(Math.random() * 1000, 10);;
   const putExtra = {
       fileName: '',
       params: {},

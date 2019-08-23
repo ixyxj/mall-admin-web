@@ -137,8 +137,8 @@
     }
   ];
   const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 10,
+    page: 1,
+    size: 10,
     useStatus: null,
     orderSn: null,
     couponId: null
@@ -256,16 +256,16 @@
         this.listQuery.couponId=this.$route.query.id;
       },
       handleSearchList() {
-        this.listQuery.pageNum = 1;
+        this.listQuery.page = 1;
         this.getList();
       },
       handleSizeChange(val) {
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
+        this.listQuery.page = 1;
+        this.listQuery.size = val;
         this.getList();
       },
       handleCurrentChange(val) {
-        this.listQuery.pageNum = val;
+        this.listQuery.page = val;
         this.getList();
       }
     }

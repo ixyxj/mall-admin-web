@@ -123,7 +123,7 @@
     },
     methods: {
       getCateList() {
-        let listQuery = {pageNum: 1, pageSize: 100};
+        let listQuery = {page: 1, size: 100};
         fetchList(listQuery).then(response => {
           this.productAttrCateList = response.data.list;
         });

@@ -141,8 +141,8 @@
           @size-change="handleDialogSizeChange"
           @current-change="handleDialogCurrentChange"
           layout="prev, pager, next"
-          :current-page.sync="dialogData.listQuery.pageNum"
-          :page-size="dialogData.listQuery.pageSize"
+          :current-page.sync="dialogData.listQuery.page"
+          :page-size="dialogData.listQuery.size"
           :page-sizes="[5,10,15]"
           :total="dialogData.total">
         </el-pagination>
@@ -175,8 +175,8 @@
   import {formatDate} from '@/utils/date';
 
   const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 5,
+    page: 1,
+    size: 5,
     subjectName: null,
     recommendStatus: null
   };
@@ -222,8 +222,8 @@
           multipleSelection:[],
           listQuery:{
             keyword: null,
-            pageNum: 1,
-            pageSize: 5
+            page: 1,
+            size: 5
           }
         },
         sortDialogVisible:false,
@@ -254,19 +254,19 @@
         this.listQuery = Object.assign({}, defaultListQuery);
       },
       handleSearchList() {
-        this.listQuery.pageNum = 1;
+        this.listQuery.page = 1;
         this.getList();
       },
       handleSelectionChange(val){
         this.multipleSelection = val;
       },
       handleSizeChange(val) {
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
+        this.listQuery.page = 1;
+        this.listQuery.size = val;
         this.getList();
       },
       handleCurrentChange(val) {
-        this.listQuery.pageNum = val;
+        this.listQuery.page = val;
         this.getList();
       },
       handleRecommendStatusStatusChange(index,row){

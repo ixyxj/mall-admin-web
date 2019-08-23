@@ -1,5 +1,6 @@
 // date.js
 export function formatDate(date, fmt) {
+  if (!fmt) fmt ='yyyy-MM-dd hh:mm:ss';
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
   }
@@ -8,7 +9,8 @@ export function formatDate(date, fmt) {
     'd+': date.getDate(),
     'h+': date.getHours(),
     'm+': date.getMinutes(),
-    's+': date.getSeconds()
+    's+': date.getSeconds(),
+    'S+': date.getMilliseconds()
   };
   for (let k in o) {
     if (new RegExp(`(${k})`).test(fmt)) {
@@ -39,4 +41,10 @@ export function str2Date(dateStr, separator) {
   let day = parseInt(dateArr[2]);
   let date = new Date(year, month - 1, day);
   return date;
+}
+
+export function str2Millisecond(dateStr) {
+  let date = dateStr.toString().substring(0,19);
+  date = date.replace(/-/g,'/');
+  return new Date(date).getTime();
 }

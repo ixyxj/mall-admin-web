@@ -108,8 +108,8 @@
   import {fetchList,deleteCoupon} from '@/api/coupon';
   import {formatDate} from '@/utils/date';
   const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 10,
+    page: 1,
+    size: 10,
     name: null,
     type: null
   };
@@ -194,19 +194,19 @@
         this.listQuery = Object.assign({}, defaultListQuery);
       },
       handleSearchList() {
-        this.listQuery.pageNum = 1;
+        this.listQuery.page = 1;
         this.getList();
       },
       handleSelectionChange(val){
         this.multipleSelection = val;
       },
       handleSizeChange(val) {
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
+        this.listQuery.page = 1;
+        this.listQuery.size = val;
         this.getList();
       },
       handleCurrentChange(val) {
-        this.listQuery.pageNum = val;
+        this.listQuery.page = val;
         this.getList();
       },
       handleAdd(){

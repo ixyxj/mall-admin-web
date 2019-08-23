@@ -132,8 +132,8 @@
   import {formatDate} from '@/utils/date';
   import {fetchList,deleteApply} from '@/api/returnApply';
   const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 10,
+    page: 1,
+    size: 10,
     id: null,
     receiverKeyword: null,
     status: null,
@@ -208,7 +208,7 @@
         this.listQuery = Object.assign({}, defaultListQuery);
       },
       handleSearchList() {
-        this.listQuery.pageNum = 1;
+        this.listQuery.page = 1;
         this.getList();
       },
       handleViewDetail(index,row){
@@ -247,12 +247,12 @@
         }
       },
       handleSizeChange(val){
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
+        this.listQuery.page = 1;
+        this.listQuery.size = val;
         this.getList();
       },
       handleCurrentChange(val){
-        this.listQuery.pageNum = val;
+        this.listQuery.page = val;
         this.getList();
       },
       getList(){

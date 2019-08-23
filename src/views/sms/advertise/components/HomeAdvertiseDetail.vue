@@ -5,7 +5,7 @@
              ref="homeAdvertiseFrom"
              label-width="150px"
              size="small">
-      <el-form-item label="广告名称：" prop="name">
+      <el-form-item label="广告名称：" prop="advertName">
         <el-input v-model="homeAdvertise.advertName" class="input-width"></el-input>
       </el-form-item>
       <el-form-item label="广告位置：">
@@ -20,20 +20,22 @@
       </el-form-item>
       <el-form-item label="开始时间：" prop="startTime">
         <el-date-picker
+          format="yyyy-MM-dd HH:mm:ss"
           type="datetime"
           placeholder="选择日期"
           v-model="homeAdvertise.startTime"></el-date-picker>
       </el-form-item>
-      <el-form-item label="到期时间：" prop="endTime">
+      <el-form-item label="到期时间：" prop="dueTime">
         <el-date-picker
+          format="yyyy-MM-dd HH:mm:ss"
           type="datetime"
           placeholder="选择日期"
           v-model="homeAdvertise.dueTime"></el-date-picker>
       </el-form-item>
       <el-form-item label="上线/下线：">
         <el-radio-group v-model="homeAdvertise.isOnline">
-          <el-radio :label="0">上线</el-radio>
-          <el-radio :label="1">下线</el-radio>
+          <el-radio :label="1">上线</el-radio>
+          <el-radio :label="0">下线</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="广告图片：">
@@ -42,7 +44,7 @@
       <el-form-item label="排序：" hidden="hidden">
         <el-input v-model="homeAdvertise.sort" class="input-width"></el-input>
       </el-form-item>
-      <el-form-item label="广告链接：" prop="url">
+      <el-form-item label="广告链接：">
         <el-select v-model="selectParentCategory"
                    size="small"
                    placeholder="一级分类"
@@ -62,7 +64,7 @@
             :value="item.kindCode">
           </el-option>
         </el-select>
-        <el-input v-model="url" class="input-width"></el-input>
+        <el-input v-model="url" class="input-width" prop="url"></el-input>
       </el-form-item>
       <el-form-item label="广告备注：">
         <el-input
@@ -82,26 +84,27 @@
 </template>
 <script>
     import SingleUpload from '@/components/Upload/qiniuSingleUpload'
-    import {createHomeAdvertise, getHomeAdvertise, updateHomeAdvertise} from '@/api/homeAdvertise'
+    import {createHomeAdvertise, updateHomeAdvertise} from '@/api/homeAdvertise'
     import {fetchListWithChildren} from "@/api/productCate";
     import {getArray, checkSuccess} from "@/utils/response";
+    import {formatDate} from "@/utils/date";
 
     const defaultTypeOptions = [
         {
             label: '小程序首页轮播',
-            value: 0
-        },
-        {
-            label: '小程序banner',
             value: 1
         },
         {
-            label: 'PC端首页轮播',
+            label: '小程序banner',
             value: 2
         },
         {
-            label: 'PC端分类广告',
+            label: 'PC端首页轮播',
             value: 3
+        },
+        {
+            label: 'PC端分类广告',
+            value: 4
         }
     ];
     const defaultHomeAdvertise = {
@@ -110,10 +113,10 @@
         type: 0,
         startTime: null,
         dueTime: null,
-        linkUrl: null,
+        linkUrl: 'http://www.1688bee.com/',
         advertNote: null,
         sort: 0,
-        isOnline:0,
+        isOnline: 0,
         isTop: 0,
         kindName: null,
         kindCode: null,
@@ -147,7 +150,10 @@
                     ],
                     advertImage: [
                         {required: true, message: '请选择广告图片', trigger: 'blur'}
-                    ]
+                    ],
+                    // advertMark: [
+                    //     {required: true, message: '请输入内容', trigger: 'blur'}
+                    // ]
                 },
                 typeOptions: Object.assign({}, defaultTypeOptions),
                 categoryParentOptions: [],
@@ -159,8 +165,9 @@
         },
         watch: {
             selectParentCategory: function (newValue) {
+                this.url = null;
                 this.homeAdvertise.kindCode = null;
-                this.homeAdvertise.linkUrl = null;
+                this.selectChildCategory = null;
                 if (newValue != null) {
                     fetchListWithChildren(newValue).then(response => {
                         if (checkSuccess(response)) {
@@ -169,18 +176,19 @@
                     })
                 } else {
                     this.categoryChildOptions = [];
-                    this.selectChildCategory = null;
                 }
             },
             selectChildCategory: function (newValue) {
                 this.url = newValue;
+                this.homeAdvertise.kindCode = newValue;
+                this.homeAdvertise.kindName = this.categoryChildOptions.forEach(option => {
+                    if (newValue === option.kindCode) return option.kindName;
+                });
             }
         },
         created() {
             if (this.isEdit) {
-                getHomeAdvertise(this.$route.query.id).then(response => {
-                    this.homeAdvertise = response.data;
-                });
+                this.homeAdvertise = this.$route.query.data;
             } else {
                 this.homeAdvertise = Object.assign({}, defaultHomeAdvertise);
             }
@@ -200,6 +208,8 @@
                             cancelButtonText: '取消',
                             type: 'warning'
                         }).then(() => {
+                            this.homeAdvertise.startTime = formatDate(this.homeAdvertise.startTime);
+                            this.homeAdvertise.dueTime = formatDate(this.homeAdvertise.dueTime);
                             if (this.isEdit) {
                                 updateHomeAdvertise(this.$route.query.id, this.homeAdvertise).then(response => {
                                     this.$refs[formName].resetFields();
@@ -212,13 +222,17 @@
                                 });
                             } else {
                                 createHomeAdvertise(this.homeAdvertise).then(response => {
-                                    this.$refs[formName].resetFields();
-                                    this.homeAdvertise = Object.assign({}, defaultHomeAdvertise);
-                                    this.$message({
-                                        message: '提交成功',
-                                        type: 'success',
-                                        duration: 1000
-                                    });
+                                    if (checkSuccess(response)) {
+                                        this.$refs[formName].resetFields();
+                                        this.homeAdvertise = Object.assign({}, defaultHomeAdvertise);
+                                        this.$message({
+                                            message: this.$t('message.submitSuccess'),
+                                            type: 'success',
+                                            duration: 1000
+                                        });
+                                    } else {
+                                        this.$message.error(this.$t('message.submitFailure'))
+                                    }
                                 });
                             }
                         });
@@ -236,7 +250,7 @@
             resetForm(formName) {
                 this.$refs[formName].resetFields();
                 this.homeAdvertise = Object.assign({}, defaultHomeAdvertise);
-            }
+            },
         }
     }
 </script>

@@ -5,4 +5,6 @@ export const message = {
   success: '成功',
   deleteSuccess: '删除成功^_^',
   deleteFailure: '删除失败！',
+  submitSuccess: '提交成功^_^',
+  submitFailure: '提交失败！',
 };

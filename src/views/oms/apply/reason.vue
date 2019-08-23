@@ -108,8 +108,8 @@
   import {formatDate} from '@/utils/date';
   import {fetchList,deleteReason,updateStatus,addReason,getReasonDetail,updateReason} from '@/api/returnReason';
   const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 5
+    page: 1,
+    size: 5
   };
   const defaultReturnReason = {
     name:null,
@@ -226,12 +226,12 @@
         }
       },
       handleSizeChange(val){
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
+        this.listQuery.page = 1;
+        this.listQuery.size = val;
         this.getList();
       },
       handleCurrentChange(val){
-        this.listQuery.pageNum = val;
+        this.listQuery.page = val;
         this.getList();
       },
       getList(){
@@ -256,7 +256,7 @@
               type: 'success',
               duration: 1000
             });
-            this.listQuery.pageNum=1;
+            this.listQuery.page=1;
             this.getList();
           });
         })

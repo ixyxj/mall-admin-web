@@ -6,23 +6,37 @@ export function fetchList(data) {
     data:data
   })
 }
-export function updateStatus(id,params) {
+
+export function updateStatus(status, ids) {
+  if (status === 0) return notOnline(ids);
+  else return isOnline(ids)
+}
+
+function notOnline(ids) {
   return request({
-    url:'/home/advertise/update/status/'+id,
+    url:'/order/notOnline',
     method:'post',
-    params:params
+    data:ids
   })
 }
-export function deleteHomeAdvertise(data) {
+
+function isOnline(ids) {
   return request({
-    url:'/home/advertise/delete',
+    url:'/order/isOnline',
     method:'post',
-    data:data
+    data:ids
+  })
+}
+
+export function deleteHomeAdvertise(code) {
+  return request({
+    url:'/order/delAdvert/' + code,
+    method:'get'
   })
 }
 export function createHomeAdvertise(data) {
   return request({
-    url:'/home/advertise/create',
+    url:'/order/addAdvert',
     method:'post',
     data:data
   })

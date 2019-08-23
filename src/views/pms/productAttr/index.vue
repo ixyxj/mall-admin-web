@@ -61,9 +61,9 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         layout="total, sizes,prev, pager, next,jumper"
-        :page-size="listQuery.pageSize"
+        :page-size="listQuery.size"
         :page-sizes="[5,10,15]"
-        :current-page.sync="listQuery.pageNum"
+        :current-page.sync="listQuery.page"
         :total="total">
       </el-pagination>
     </div>
@@ -94,8 +94,8 @@
         total: null,
         listLoading: true,
         listQuery: {
-          pageNum: 1,
-          pageSize: 5
+          page: 1,
+          size: 5
         },
         dialogVisible: false,
         dialogTitle:'',

@@ -250,7 +250,7 @@
         this.hasEditCreated=true;
       },
       getProductAttrCateList() {
-        let param = {pageNum: 1, pageSize: 100};
+        let param = {page: 1, size: 100};
         fetchProductAttrCateList(param).then(response => {
           this.productAttributeCategoryOptions = [];
           let list = response.data.list;
@@ -260,7 +260,7 @@
         });
       },
       getProductAttrList(type, cid) {
-        let param = {pageNum: 1, pageSize: 100, type: type};
+        let param = {page: 1, size: 100, type: type};
         fetchProductAttrList(cid, param).then(response => {
           let list = response.data.list;
           if (type === 0) {
