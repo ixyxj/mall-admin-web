@@ -311,6 +311,40 @@ export const constantRouterMap = [
       }
     ]
   },
+  {
+    path: '/content',
+    component: Layout,
+    redirect: '/content/article',
+    name: 'content',
+    meta: {title: '内容', icon: 'sms'},
+    children: [
+      {
+        path: 'article',
+        name: 'article',
+        component: () => import('@/views/content/article/index'),
+        meta: {title: '文章列表', icon: 'sms-ad'}
+      },
+      {
+        path: 'addArticle',
+        name: 'addArticle',
+        component: () => import('@/views/content/article/add'),
+        meta: {title: '添加文章', icon: 'sms-new'}
+      },
+      {
+        path: 'addArticle',
+        name: 'addArticle',
+        component: () => import('@/views/content/article/add'),
+        meta: {title: '修改文章'},
+        hidden: true
+      },
+      {
+        path: 'articleCate',
+        name: 'articleCate',
+        component: () => import('@/views/content/articleCate/index'),
+        meta: {title: '分类管理', icon: 'sms-ad'}
+      },
+    ]
+  },
   {path: '*', redirect: '/404', hidden: true}
 ]
 
