@@ -208,8 +208,10 @@
                             cancelButtonText: '取消',
                             type: 'warning'
                         }).then(() => {
-                            this.homeAdvertise.startTime = formatDate(this.homeAdvertise.startTime);
-                            this.homeAdvertise.dueTime = formatDate(this.homeAdvertise.dueTime);
+                            // this.homeAdvertise.startTime = formatDate(this.homeAdvertise.startTime);
+                            // this.homeAdvertise.dueTime = formatDate(this.homeAdvertise.dueTime);{
+                            this.homeAdvertise.startTime = this.homeAdvertise.startTime.getTime().toString();
+                            this.homeAdvertise.dueTime = this.homeAdvertise.dueTime.getTime().toString();
                             if (this.isEdit) {
                                 updateHomeAdvertise(this.$route.query.id, this.homeAdvertise).then(response => {
                                     this.$refs[formName].resetFields();

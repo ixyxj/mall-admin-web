@@ -35,6 +35,7 @@
           <el-form-item label="到期时间：">
             <el-date-picker
               class="input-width"
+              format="yyyy-MM-dd HH:mm:ss"
               v-model="listQuery.dueTime"
               type="datetime"
               placeholder="请选择时间">
@@ -189,13 +190,14 @@
         filters: {
             formatType(type) {
                 const index = type - 1;
+                if (index < 0) return '类型不正确';
                 return defaultTypeOptions[index].label;
             },
             formatTime(time) {
                 if (time == null || time === '') {
                     return 'N/A';
                 }
-                let date = new Date(time);
+                let date = new Date(parseFloat(time));
                 return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
             },
         },
@@ -208,7 +210,7 @@
                 if ('' === this.listQuery.advertName) delete this.listQuery.advertName;
                 if ('' === this.listQuery.type) delete this.listQuery.type;
                 if (null === this.listQuery.dueTime) delete this.listQuery.dueTime;
-                this.listQuery.dueTime = this.listQuery.dueTime.getTime().toString();
+                else this.listQuery.dueTime = this.listQuery.dueTime.getTime().toString();
                 this.getList();
             },
             handleSelectionChange(val) {
