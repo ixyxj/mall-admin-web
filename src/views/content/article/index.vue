@@ -277,10 +277,10 @@
                 }
             },
             handleAdd() {
-                this.$router.push({path: '/sms/addAdvertise'})
+                this.$router.push({path: '/content/addArticle'})
             },
             handleUpdate(index, row) {
-                this.$router.push({path: '/sms/updateAdvertise', query: {data: row}})
+                this.$router.push({path: '/content/updateArticle', query: {data: row}})
             },
             //show article
             handleShow(index, row) {

@@ -64,3 +64,19 @@ export function fetchListWithCategory() {
     method: 'post'
   })
 }
+
+export function createArticle(data) {
+  return request({
+    url: '/member/addArticle',
+    method: 'post',
+    data: data
+  })
+}
+
+export function updateArticle(data) {
+  return request({
+    url: '/member/updateArticle',
+    method: 'post',
+    data: data
+  })
+}

@@ -148,6 +148,7 @@ export const constantRouterMap = [
     redirect: '/oms/order',
     name: 'oms',
     meta: {title: '订单', icon: 'order'},
+    hidden: true,
     children: [
       {
         path: 'order',
@@ -174,7 +175,6 @@ export const constantRouterMap = [
         name: 'orderSetting',
         component: () => import('@/views/oms/order/setting'),
         meta: {title: '订单设置', icon: 'order-setting'},
-        hidden: true
       },
       {
         path: 'returnApply',

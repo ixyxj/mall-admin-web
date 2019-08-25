@@ -7,4 +7,6 @@ export const message = {
   deleteFailure: '删除失败！',
   submitSuccess: '提交成功^_^',
   submitFailure: '提交失败！',
+  hintInputTitle: '请输入分类',
+  hintChoiceCategory: '请选择分类',
 };
