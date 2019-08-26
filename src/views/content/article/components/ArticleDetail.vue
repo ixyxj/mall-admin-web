@@ -116,6 +116,7 @@
         methods: {
             beforeSubmit() {
               for (let i = 0; i < this.cateOptions.length; i++) {
+                  let o = this.cateOptions[i];
                   if (o.categoryCode === this.article.categoryCode) {
                       this.article.categoryName = o.categoryName;
                       break;

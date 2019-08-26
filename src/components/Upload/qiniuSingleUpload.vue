@@ -70,8 +70,7 @@
                 this.dialogVisible = true;
             },
             beforeUpload(file) {
-                console.log(file.size)
-                const isLimit = file.size <= 1024*1024*2; //200k
+                const isLimit = file.size <= 1024*1024*200; //200k
                 if (!isLimit) this.$message.error('上传图片大小不能超过200k!!!');
                 return isLimit;
             },

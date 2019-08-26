@@ -64,8 +64,8 @@
           <template slot-scope="scope">
             <el-switch
               @change="handleUpdateStatus(scope.$index, scope.row)"
-              :active-value="0"
-              :inactive-value="1"
+              :active-value="1"
+              :inactive-value="0"
               v-model="scope.row.isEnable">
             </el-switch>
           </template>

@@ -17,9 +17,9 @@ service.interceptors.request.use(config => {
   return config
 }, error => {
   // Do something with request error
-  console.log(error) // for debug
+  console.log(error); // for debug
   Promise.reject(error)
-})
+});
 
 // respone拦截器
 service.interceptors.response.use(
@@ -31,10 +31,10 @@ service.interceptors.response.use(
     const resultStatus = res.resultStatus
     if (resultStatus.resultCode !== '0000') {
       Message({
-        message: res.message,
+        message: res.resultStatus.resultMessage,
         type: 'error',
         duration: 3 * 1000
-      })
+      });
 
       // 401:未登录;
       if (resultStatus.resultCode === 401 || resultStatus.resultCode === 403) {
@@ -54,14 +54,14 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error)// for debug
+    //console.log('err' + error)// for debug
     Message({
       message: error.message,
       type: 'error',
       duration: 3 * 1000
-    })
+    });
     return Promise.reject(error)
   }
-)
+);
 
 export default service

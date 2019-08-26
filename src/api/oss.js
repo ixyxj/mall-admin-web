@@ -38,12 +38,17 @@ export function upload(token, request, next, error, completed) {
     maxHeight: 2000
   };
 
-  qiniu.compressImage(file, options).then(data => {
-    let observable = qiniu.upload(data.dist, key, token, putExtra, config);
-    let subscription = observable.subscribe(next, error, completed);
-    return subscription
-  }).catch(reason => {
-    console.log(reason);
-    return reason;
-  });
+  if (file.type === 'video/mp4') {
+    putExtra.mimeType = file.type;
+    let observable = qiniu.upload(file, key, token, putExtra, config);
+    return observable.subscribe(next, error, completed);
+  } else {
+    qiniu.compressImage(file, options).then(data => {
+      let observable = qiniu.upload(data.dist, key, token, putExtra, config);
+      return observable.subscribe(next, error, completed);
+    }).catch(reason => {
+      console.log(reason);
+      return reason;
+    });
+  }
 }
