@@ -1,45 +1,46 @@
 import request from '@/utils/request'
-export function fetchList(cid,params) {
+export function fetchList(data) {
   return request({
-    url:'/productAttribute/list/'+cid,
-    method:'get',
-    params:params
+    url:'/product/selectProductPropByPCPage',
+    method:'post',
+    data:data
   })
 }
 
-export function deleteProductAttr(data) {
+export function deleteProductAttr(ids) {
   return request({
-    url:'/productAttribute/delete',
+    url:'/product/deleteList',
     method:'post',
-    data:data
+    data:ids
   })
 }
 
 export function createProductAttr(data) {
   return request({
-    url:'/productAttribute/create',
+    url:'/product/addProductProp',
     method:'post',
     data:data
   })
 }
 
-export function updateProductAttr(id,data) {
+export function updateProductAttr(data) {
   return request({
-    url:'/productAttribute/update/'+id,
+    url:'/product/updateProductProp',
     method:'post',
     data:data
   })
 }
+
 export function getProductAttr(id) {
   return request({
-    url:'/productAttribute/'+id,
+    url:'/product/'+id,
     method:'get'
   })
 }
 
 export function getProductAttrInfo(productCategoryId) {
   return request({
-    url:'/productAttribute/attrInfo/'+productCategoryId,
+    url:'/product/attrInfo/'+productCategoryId,
     method:'get'
   })
 }

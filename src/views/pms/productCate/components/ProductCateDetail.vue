@@ -42,8 +42,7 @@
       <el-form-item v-for="(filterProductAttr, index) in filterProductAttrList"
                     :label="index | filterLabelFilter"
                     :key="filterProductAttr.key"
-                    :hidden="true"
-      >
+                    :hidden="true">
         <el-cascader
           clearable
           v-model="filterProductAttr.value"
@@ -72,8 +71,8 @@
     import {fetchList, createProductCate, updateProductCate, getProductCate} from '@/api/productCate';
     import {fetchListWithAttr} from '@/api/productAttrCate';
     import {getProductAttrInfo} from '@/api/productAttr';
-    import SingleUpload from '@/components/Upload/singleUpload';
-    import {checkSuccess} from "../../../../utils/response";
+    import SingleUpload from '@/components/Upload/qiniuSingleUpload';
+    import {checkSuccess} from "@/utils/response";
 
 
     const defaultProductCate = {

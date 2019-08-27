@@ -1,48 +1,12 @@
 <template> 
   <div class="app-container">
-    <el-card class="filter-container" shadow="never">
-      <div>
-        <i class="el-icon-search"></i>
-        <span>筛选搜索</span>
-        <el-button
-          style="float:right"
-          type="primary"
-          @click="handleSearchList()"
-          size="small">
-          查询搜索
-        </el-button>
-        <el-button
-          style="float:right;margin-right: 15px"
-          @click="handleResetSearch()"
-          size="small">
-          重置
-        </el-button>
-      </div>
-      <div style="margin-top: 15px">
-        <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
-          <el-form-item label="文章标题：">
-            <el-input v-model="listQuery.title" class="input-width" placeholder="广告名称"></el-input>
-          </el-form-item>
-          <el-form-item label="文章分类：">
-            <el-select v-model="listQuery.categoryName" placeholder="全部" clearable class="input-width">
-              <el-option v-for="item in categoryOptions"
-                         :key="item.id"
-                         :label="item.categoryName"
-                         :value="item.categoryName">
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
-      </div>
-    </el-card>
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
-      <span>数据列表</span>
-      <el-button size="mini" class="btn-add" @click="handleAdd()">分类管理</el-button>
-      <el-button size="mini" class="btn-add" @click="handleAdd()">发布文章</el-button>
+      <span>快递单模板</span>
+      <el-button size="mini" class="btn-add" @click="handleAdd()">添加</el-button>
     </el-card>
     <div class="table-container">
-      <el-table ref="articleTable"
+      <el-table ref="freightFare"
                 :data="list"
                 style="width: 100%;"
                 @selection-change="handleSelectionChange"
@@ -51,16 +15,28 @@
         <el-table-column label="编号" width="60" align="center">
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
-        <el-table-column label="封面图片" width="120" align="center">
-          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.image"></template>
+        <el-table-column label="模板名称" align="center">
+          <template slot-scope="scope">{{scope.row.tempName}}</template>
         </el-table-column>
-        <el-table-column label="标题" align="center">
-          <template slot-scope="scope">{{scope.row.title}}</template>
+        <el-table-column label="计价方式" width="120" align="center">
+          <template slot-scope="scope">{{scope.row.priceMethod}}</template>
         </el-table-column>
-        <el-table-column label="分类" align="center">
-          <template slot-scope="scope">{{scope.row.categoryName}}</template>
+        <el-table-column label="数量" align="center">
+          <template slot-scope="scope">{{scope.row.quantity}}</template>
         </el-table-column>
-        <el-table-column label="是否显示" width="120" align="center">
+        <el-table-column label="起步价" width="120" align="center">
+          <template slot-scope="scope">{{scope.row.minPrice}}</template>
+        </el-table-column>
+        <el-table-column label="增加数量" width="120" align="center">
+          <template slot-scope="scope">{{scope.row.inPrice}}</template>
+        </el-table-column>
+        <el-table-column label="加价" width="120" align="center">
+          <template slot-scope="scope">{{scope.row.addPrice}}</template>
+        </el-table-column>
+        <el-table-column label="运送到" width="120" align="center">
+          <template slot-scope="scope">{{scope.row.destination}}</template>
+        </el-table-column>
+        <el-table-column label="是否启动" width="120" align="center">
           <template slot-scope="scope">
             <el-switch
               @change="handleUpdateStatus(scope.$index, scope.row)"
@@ -70,28 +46,8 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="是否置顶" width="120" align="center">
+        <el-table-column label="操作" width="120" align="center">
           <template slot-scope="scope">
-            <el-switch
-              @change="handleUpdateTop(scope.$index, scope.row)"
-              :active-value="1"
-              :inactive-value="0"
-              v-model="scope.row.isTop">
-            </el-switch>
-          </template>
-        </el-table-column>
-        <el-table-column label="发布时间" align="center">
-          <template slot-scope="scope">{{scope.row.createTime | formatTime}}</template>
-        </el-table-column>
-        <el-table-column label="查看次数" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.visits}}</template>
-        </el-table-column>
-        <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
-            <el-button size="mini"
-                       type="text"
-                       @click="handleShow(scope.$index, scope.row)">查看
-            </el-button>
             <el-button size="mini"
                        type="text"
                        @click="handleUpdate(scope.$index, scope.row)">编辑
@@ -139,22 +95,19 @@
   </div>
 </template>
 <script>
-    import {fetchList, updateStatus,
-      updateTopStatus, deleteArticle,
-      fetchListWithCategory} from '@/api/article';
-    import {formatDate} from '@/utils/date';
-    import {checkSuccess, getList, getTotal, getArray} from "@/utils/response";
+    import {fetchList, updateStatus, deleteFreightFare} from '@/api/freightFare';
+    import {checkSuccess, getList, getTotal} from "@/utils/response";
 
     const defaultListQuery = {
         page: 1,
         size: 10,
     };
+
     export default {
-        name: 'articleList',
+        name: 'freightFare',
         data() {
             return {
                 listQuery: Object.assign({}, defaultListQuery),
-                categoryOptions: null,
                 list: null,
                 total: null,
                 listLoading: false,
@@ -170,16 +123,6 @@
         },
         created() {
             this.getList();
-            this.getCategoryList();
-        },
-        filters: {
-            formatTime(time) {
-                if (time == null || time === '') {
-                    return 'N/A';
-                }
-                let date = new Date(time);
-                return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
-            },
         },
         methods: {
             handleResetSearch() {
@@ -187,8 +130,10 @@
             },
             handleSearchList() {
                 this.listQuery.page = 1;
-                if ('' === this.listQuery.title) delete this.listQuery.title;
-                if ('' === this.listQuery.categoryName) delete this.listQuery.categoryName;
+                if ('' === this.listQuery.advertName) delete this.listQuery.advertName;
+                if ('' === this.listQuery.type) delete this.listQuery.type;
+                if (null === this.listQuery.dueTime) delete this.listQuery.dueTime;
+                else this.listQuery.dueTime = this.listQuery.dueTime.getTime().toString();
                 this.getList();
             },
             handleSelectionChange(val) {
@@ -203,14 +148,13 @@
                 this.listQuery.page = val;
                 this.getList();
             },
-            // op show status
             handleUpdateStatus(index, row) {
-                this.$confirm('是否要修改显示状态?', '提示', {
+                this.$confirm('是否要修改上线/下线状态?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    updateStatus(row.isEnable, [row.articleCode]).then(response => {
+                    updateStatus(row.isOnline, [row.advertCode]).then(response => {
                         this.getList();
                         this.$message({
                             type: 'success',
@@ -225,32 +169,8 @@
                     this.getList();
                 });
             },
-            //op top status
-            handleUpdateTop(index, row) {
-                this.$confirm('是否置顶?', '提示', {
-                  confirmButtonText: '确定',
-                  cancelButtonText: '取消',
-                  type: 'warning'
-                }).then(() => {
-                  updateTopStatus(row.isTop, [row.articleCode]).then(response => {
-                    this.getList();
-                    this.$message({
-                      type: 'success',
-                      message: '修改成功!'
-                    });
-                  });
-                }).catch(reason => {
-                  this.$message({
-                    type: 'success',
-                    message: '已取消操作!'
-                  });
-                  this.getList();
-                });
-            },
             handleDelete(index, row) {
-                let arr = [];
-                arr.push(row.articleCode);
-                this.deleteHomeArticle(arr);
+                this.deleteHomeAdvertise(row.advertCode);
             },
             handleBatchOperate() {
                 if (this.multipleSelection < 1) {
@@ -277,14 +197,10 @@
                 }
             },
             handleAdd() {
-                this.$router.push({path: '/content/addArticle'})
+                this.$router.push({path: '/oms/addFreightFare'})
             },
             handleUpdate(index, row) {
-                this.$router.push({path: '/content/updateArticle', query: {data: row}})
-            },
-            //show article
-            handleShow(index, row) {
-
+                this.$router.push({path: '/oms/updateFreightFare', query: {data: row}})
             },
             getList() {
                 this.listLoading = true;
@@ -297,21 +213,13 @@
                     }
                 })
             },
-            getCategoryList() {
-                fetchListWithCategory().then(response => {
-                  console.log(response);
-                    if (checkSuccess(response)) {
-                      this.categoryOptions = getArray(response);
-                    }
-                })
-            },
-            deleteHomeArticle(ids) {
-                this.$confirm('是否要删除文章?', '提示', {
+            deleteHomeAdvertise(ids) {
+                this.$confirm('是否要删除该广告?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    deleteArticle(ids).then(response => {
+                    deleteHomeAdvertise(ids).then(response => {
                         this.getList();
                         this.$message({
                             type: 'success',

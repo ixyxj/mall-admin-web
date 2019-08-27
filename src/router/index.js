@@ -98,25 +98,47 @@ export const constantRouterMap = [
         name: 'productAttr',
         component: () => import('@/views/pms/productAttr/index'),
         meta: {title: '商品类型', icon: 'product-attr'},
-        hidden: true
       },
       {
         path: 'productAttrList',
         name: 'productAttrList',
         component: () => import('@/views/pms/productAttr/productAttrList'),
         meta: {title: '属性列表', icon: 'product-attr'},
+        hidden: true
       },
       {
         path: 'addProductAttr',
         name: 'addProductAttr',
         component: () => import('@/views/pms/productAttr/addProductAttr'),
         meta: {title: '添加属性', icon: 'product-add'},
+        hidden: true
       },
       {
         path: 'updateProductAttr',
         name: 'updateProductAttr',
         component: () => import('@/views/pms/productAttr/updateProductAttr'),
         meta: {title: '修改属性'},
+        hidden: true
+      },
+      {
+        path: 'productPropsList',
+        name: 'productPropsList',
+        component: () => import('@/views/pms/productAttr/productParamList'),
+        meta: {title: '参数列表', icon: 'product-attr'},
+        hidden: true
+      },
+      {
+        path: 'addProductProps',
+        name: 'addProductProps',
+        component: () => import('@/views/pms/productAttr/addProductParam'),
+        meta: {title: '添加参数', icon: 'product-add'},
+        hidden: true
+      },
+      {
+        path: 'updateProductProps',
+        name: 'updateProductProps',
+        component: () => import('@/views/pms/productAttr/updateProductParam'),
+        meta: {title: '修改参数'},
         hidden: true
       },
       {
@@ -148,7 +170,6 @@ export const constantRouterMap = [
     redirect: '/oms/order',
     name: 'oms',
     meta: {title: '订单', icon: 'order'},
-    hidden: true,
     children: [
       {
         path: 'order',
@@ -175,6 +196,7 @@ export const constantRouterMap = [
         name: 'orderSetting',
         component: () => import('@/views/oms/order/setting'),
         meta: {title: '订单设置', icon: 'order-setting'},
+        hidden: true,
       },
       {
         path: 'returnApply',
@@ -196,7 +218,27 @@ export const constantRouterMap = [
         component: () => import('@/views/oms/apply/applyDetail'),
         meta: {title: '退货原因详情'},
         hidden: true
-      }
+      },
+      {
+        path: 'freightFare',
+        name: 'freightFare',
+        component: () => import('@/views/oms/freightFare/index'),
+        meta: {title: '运费模板', icon: 'sms-ad'}
+      },
+      {
+        path: 'addFreightFare',
+        name: 'addFreightFare',
+        component: () => import('@/views/oms/freightFare/add'),
+        meta: {title: '添加运费模板', icon: 'sms-new'},
+        hidden: true
+      },
+      {
+        path: 'updateFreightFare',
+        name: 'updateFreightFare',
+        component: () => import('@/views/oms/freightFare/update'),
+        meta: {title: '编辑运费模板', icon: 'sms-new'},
+        hidden: true
+      },
     ]
   },
   {
@@ -331,8 +373,8 @@ export const constantRouterMap = [
         meta: {title: '添加文章', icon: 'sms-new'}
       },
       {
-        path: 'addArticle',
-        name: 'addArticle',
+        path: 'updateArticle',
+        name: 'updateArticle',
         component: () => import('@/views/content/article/add'),
         meta: {title: '修改文章'},
         hidden: true
@@ -346,7 +388,7 @@ export const constantRouterMap = [
     ]
   },
   {path: '*', redirect: '/404', hidden: true}
-]
+];
 
 export default new Router({
   // mode: 'history', //后端支持可开

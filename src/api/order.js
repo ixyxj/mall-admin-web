@@ -1,9 +1,9 @@
 import request from '@/utils/request'
-export function fetchList(params) {
+export function fetchList(data) {
   return request({
-    url:'/order/list',
-    method:'get',
-    params:params
+    url:'/order/selectOrderByPcPage',
+    method:'post',
+    data:data
   })
 }
 
